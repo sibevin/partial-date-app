@@ -24,7 +24,22 @@ class BooksController < ApplicationController
   # POST /books
   # POST /books.json
   def create
-    @book = Book.new(book_params)
+
+    if params[:book][:"release_date(2i)"] == ''
+      # no month is given, insert fake month and day
+      params[:book][:"release_date(2i)"] = '1'
+      params[:book][:"release_date(3i)"] = '1'
+      mask = 4 # 100
+    elsif params[:book][:"release_date(3i)"] == ''
+      # no day is given, insert a fake day
+      params[:book][:"release_date(3i)"] = '1'
+      mask = 6 # 110
+    else
+      # full-date
+      mask = 7 # 111
+    end
+
+    @book = Book.new(book_params.merge(date_mask: mask))
 
     respond_to do |format|
       if @book.save
@@ -69,6 +84,6 @@ class BooksController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def book_params
-      params.require(:book).permit(:name, :release_date)
+      params.require(:book).permit(:name, :release_date, :date_mask)
     end
 end
