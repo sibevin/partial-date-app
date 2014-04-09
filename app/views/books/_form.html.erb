@@ -17,7 +17,7 @@
   </div>
   <div class="field">
     <%= f.label :release_date %><br>
-    <%= f.date_select :release_date, include_blank: true %>
+    <%= f.date_select :release_date, @book.get_date_select_opt %>
   </div>
   <div class="actions">
     <%= f.submit %>
