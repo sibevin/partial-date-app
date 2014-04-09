@@ -55,8 +55,22 @@ class BooksController < ApplicationController
   # PATCH/PUT /books/1
   # PATCH/PUT /books/1.json
   def update
+    if params[:book][:"release_date(2i)"] == ''
+      # no month is given, insert fake month and day
+      params[:book][:"release_date(2i)"] = '1'
+      params[:book][:"release_date(3i)"] = '1'
+      mask = 4 # 100
+    elsif params[:book][:"release_date(3i)"] == ''
+      # no day is given, insert a fake day
+      params[:book][:"release_date(3i)"] = '1'
+      mask = 6 # 110
+    else
+      # full-date
+      mask = 7 # 111
+    end
+
     respond_to do |format|
-      if @book.update(book_params)
+      if @book.update(book_params.merge(date_mask: mask))
         format.html { redirect_to @book, notice: 'Book was successfully updated.' }
         format.json { head :no_content }
       else
